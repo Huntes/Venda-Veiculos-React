@@ -1,1 +1,0 @@
-export {default as CadastroUsuario } from './Cadastro'

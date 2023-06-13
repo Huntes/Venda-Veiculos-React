@@ -18,12 +18,15 @@ const ActionAreaCard = ({data}: CardProps) =>{
         <CardMedia
           component="img"
           height="140"
-          image={''}
+          image={data.Fotos?.at(0)?.base64 ?? 'src/assets/images/imageCar.jpg'}
           alt={''}
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
             {`${data?.nome} - ${data?.modelo}`}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {`${data?.marca.toString()} - ${data?.ano.toString()} - ${data?.quilometragem.toString()} km`}
           </Typography>
           <Typography variant="body2" color="#3374db">
              {`Preço à vista - R$ ${data?.preco.toString()}`}

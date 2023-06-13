@@ -14,8 +14,8 @@ import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import CarRentalIcon from '@mui/icons-material/CarRental';
 
-const pages = ['Cadastrar Veículo', 'Pesquisar Veiculo', 'Sobre'];
-const settings = ['Perfil', 'Dashboard', 'Logout'];
+const pages = ['Cadastrar Veículo', 'Pesquisar Veículo', 'Sobre'];
+const settings = ['Login', 'Dashboard', 'Logout'];
 
 function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
@@ -23,13 +23,16 @@ function ResponsiveAppBar() {
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
+    console.log('Entoru aq')
   };
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
+    console.log('entrou aq 2')
   };
 
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
+    console.log('fechou aq')
   };
 
   const handleCloseUserMenu = () => {
@@ -38,7 +41,24 @@ function ResponsiveAppBar() {
 
   const clickMenuOptions = (event: React.MouseEvent<HTMLElement>) => {
     console.log(event);
-    console.log('Entoru aq')
+    event.preventDefault();
+    console.log(event.target)
+    let button = event.target as HTMLElement;
+
+    switch(button.innerText.toUpperCase()){
+      case 'CADASTRAR VEÍCULO':
+        window.location.href = '/CadastroVeiculo';
+        break;
+      case 'PESQUISAR VEÍCULO':
+        window.location.href = '/Detalhes';
+        break;
+      case 'SOBRE':
+        window.location.href = '/';
+        break;
+      default:
+        break;
+    }
+    setAnchorElNav(null);
   }
 
   return (
@@ -94,8 +114,8 @@ function ResponsiveAppBar() {
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center" onClick={() => console.log('teste')}>{page}</Typography>
+                <MenuItem key={page}>
+                  <Typography textAlign="center" onClick={clickMenuOptions}>{page}</Typography>
                 </MenuItem>
               ))}
             </Menu>
@@ -123,7 +143,7 @@ function ResponsiveAppBar() {
             {pages.map((page) => (
               <Button
                 key={page}
-                onClick={handleCloseNavMenu}
+                onClick={clickMenuOptions}
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
                 {page}
