@@ -7,16 +7,23 @@ import {useQuery} from 'react-query'
 import { Container, Stack } from "@mui/material";
 import ResponsiveAppBar from "../../components/AppBar";
 import ActionAreaCard from "../../components/Card";
+import VeiculoService from '../../services/VeiculoService'
 
 export const Vitrine = () => {
 
+    const [data, setData] = useState<Car[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    
     //Faz a requisição para a API
-    const {data, loading} = useQuery<Car[]>('carros', async () => {
-        const response = await axios.get(`https://localhost:5501/api/Vehicles/getAll`)
-        console.log(response.data);
-        return response.data;
-    }, { 
-        refetchOnWindowFocus: true,
+    VeiculoService.GetAll().then((response) => {
+        console.log(response);
+        setData(response[0]);
+    }).catch((error) => {
+        console.log(error);
+        setError(error);
+    }).finally(() => {
+        setLoading(false);
     });
 
     return(
