@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Container,
   Typography,
@@ -8,9 +8,13 @@ import {
   CardMedia,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import "react-responsive-carousel/lib/styles/carousel.min.css"; // Importe os estilos do carrossel
-import { Carousel } from 'react-responsive-carousel'; // Importe o componente Carousel
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+import { Carousel } from 'react-responsive-carousel';
 import ResponsiveAppBar from '../../components/AppBar';
+import { Car } from '../../types/Car' // Importe o tipo Car
+import Loading from '../../components/Loading';
+import { useParams } from 'react-router-dom';
+import VeiculoService from '../../services/VeiculoService';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -32,55 +36,94 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+
+
 export const DetalhesVeiculo = () => {
   const classes = useStyles();
 
+  const { id } = useParams();
+  const [car, setCar] = useState<Car>();
+  const [error, setError] = useState(null); 
+  const [loading, setLoading] = useState(true);
+
   const images = [
-    'src/assets/images/imageCar.jpg',
-    'src/assets/images/imageCar.jpg',
-    'src/assets/images/imageCar.jpg',
+    '../src/assets/images/imageCar.jpg',
   ];
+
+
+  VeiculoService.Get(id ?? '').then((response) => {
+    console.log(response);
+      setCar(response[0]);
+    }).catch((error) => {
+        console.log(error);
+        setError(error);
+    }).finally(() => {
+        setLoading(false);
+    });
+
+
+  if (loading) {
+    return <Loading />; // Renderizar um componente de carregamento enquanto os dados são buscados
+  }
+
+  if(error) {
+    return (
+      <div>
+        <span>Erro ao carregar dados</span>
+        <span>{error}</span>
+      </div>
+    )
+  }
 
   return (
     <div className={classes.container}>
-      <Container maxWidth="lg">
-      <ResponsiveAppBar />
+      <Container  sx={{ minHeight: "100vh", minWidth: "100vw", padding: "0", backgroundColor: "#fff" }}>
+        <ResponsiveAppBar />
         <Typography variant="h4" marginTop="25" align="center" gutterBottom>
-          Chevrolet GM
+          {car?.marca}
         </Typography>
         <Grid container justifyContent="center" spacing={2}>
           <Grid item>
-            <Carousel showThumbs={false} showStatus={false}> 
-              {images.map((image, index) => (
-                <div key={index}>
-                  <img src={image} alt={`Imagem ${index + 1}`} />
-                </div>
-              ))}
+            <Carousel showThumbs={false} showStatus={false}>
+              { car?.Fotos != null 
+              ?
+                car?.Fotos?.map((image, index) => (
+                  <div key={index}>
+                    <img src={image.base64 || 'src/assets/images/imageCar.jpg'} alt={`Imagem ${index + 1}`} />
+                  </div>
+                )) 
+              : 
+                images.map((image, index) => (
+                  <div key={index}>
+                    <img src={image} alt={`Imagem ${index + 1}`} />
+                  </div>
+                ))
+              }
             </Carousel>
           </Grid>
           <Grid container maxWidth="lg" justifyContent="center" item>
             <Card className={classes.cardContainer}>
               <CardContent className={classes.cardContent}>
                 <Typography variant="h6" gutterBottom>
-                  Nome: Nome do Veículo
+                  Nome: {car?.nome}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
-                  Marca: Marca do Veículo
+                  Marca: {car?.marca}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
-                  Modelo: Modelo do Veículo
+                  Modelo: {car?.modelo}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
-                  Ano: Ano do Veículo
+                  Ano: {car?.ano}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
-                  Status: Status do Veículo
+                  Status: {car?.status}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
-                  Preço: Preço do Veículo
+                  Preço: {car?.preco}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
-                  Quilometragem: Quilometragem do Veículo
+                  Quilometragem: {car?.quilometragem}
                 </Typography>
               </CardContent>
             </Card>
@@ -89,5 +132,4 @@ export const DetalhesVeiculo = () => {
       </Container>
     </div>
   );
-}
-
+};

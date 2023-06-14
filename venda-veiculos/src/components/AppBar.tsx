@@ -13,8 +13,10 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import CarRentalIcon from '@mui/icons-material/CarRental';
+import { Image } from 'react-bootstrap';
+import { Stack } from '@mui/material';
 
-const pages = ['Cadastrar Veículo', 'Pesquisar Veículo', 'Sobre'];
+const pages = ['Home', 'Cadastrar Veículo', 'Cadastrar Usuario'];
 const settings = ['Login', 'Dashboard', 'Logout'];
 
 function ResponsiveAppBar() {
@@ -52,7 +54,10 @@ function ResponsiveAppBar() {
       case 'PESQUISAR VEÍCULO':
         window.location.href = '/Detalhes';
         break;
-      case 'SOBRE':
+      case 'CADASTRAR USUARIO':
+        window.location.href = '/CadastroUsuario';
+        break;
+      case 'HOME':
         window.location.href = '/';
         break;
       default:
@@ -66,23 +71,9 @@ function ResponsiveAppBar() {
       <Container maxWidth="xl">
         <Toolbar disableGutters>
         <CarRentalIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }}/>
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href="/"
-            sx={{
-              mr: 2,
-              display: { xs: 'none', md: 'flex' },
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-            }}
-          >
-            Venda Veículos
-          </Typography>
+         <Stack direction={'row'} justifyContent={'flex-start'} alignContent={'center'} alignItems={'center'}> 
+          <Image src="../src/assets/ico/VendaVeiculosV1.ico" width={70} height={70} rounded={true} />
+         </Stack>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton

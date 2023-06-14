@@ -14,7 +14,7 @@ function App() {
     <>
     <Routes>
       <Route path="/" element={<Vitrine />} />
-      <Route path="/Detalhes" element={<DetalhesVeiculo />} />
+      <Route path="/detalhes-veiculo/:id" element={<DetalhesVeiculo />} />
       <Route path="/CadastroVeiculo" element={<CadastroVeiculo />}/>
       <Route path="/Login" element={<Login />}/>
       <Route path="/Logout" element={<Login />}/>
