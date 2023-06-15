@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Container,
   Typography,
@@ -7,6 +7,10 @@ import {
   Grid
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { Usuario } from '../../types/Usuario';
+import LoginService from '../../services/LoginService';
+import { Login } from '../../types/Login';
+import Swal from 'sweetalert2';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -22,13 +26,37 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const Login = () => {
+export const LoginPage = () => {
   const classes = useStyles();
+  const [login, setLogin] = useState<Login>({} as Login);
+  const [error, setError] = useState<any>(null);
 
-  const handleLogin = () => {
-    // Lógica de autenticação aqui...
-
-    window.location.href = '/';
+  const handleLogin = async () => {
+    try{
+      const {response, error, loading} = await LoginService.Login(login);
+      if(response) {
+        localStorage.setItem('token', response);
+        window.location.href = '/';
+      }else if(error) {
+        setError(error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro ao tentar realizar login.',
+          text: error,
+        });
+      } else{
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro ao tentar realizar login.',
+        });
+      }
+    } catch (error: any) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro ao realizar login',
+        text: error.message,
+      });
+    } 
   };
 
   const handleCriarConta = () => {
@@ -41,13 +69,15 @@ export const Login = () => {
         <Typography variant="h4" align="center" gutterBottom>
           Login
         </Typography>
-        <form className={classes.form}>
+        <form className={classes.form} onSubmit={handleLogin}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
                 label="Email"
                 type="email"
                 fullWidth
+                name="login"
+                onChange={(e) => setLogin({...login, login: e.target.value ?? ''})}
                 required
               />
             </Grid>
@@ -57,6 +87,8 @@ export const Login = () => {
                 type="password"
                 fullWidth
                 required
+                name="password"
+                onChange={(e) => setLogin({...login, password: e.target.value ?? ''})}
               />
             </Grid>
             <Grid item xs={12}>

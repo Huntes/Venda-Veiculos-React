@@ -49,7 +49,11 @@ export const Vitrine = () => {
     return (
         <Container sx={{ minHeight: "100vh", minWidth: "100vw", padding: "0", backgroundColor: "#fff" }}>
           <ResponsiveAppBar />
-          {loading && <Loading />}
+          {loading &&(
+            <Box mt={4} textAlign="center">
+              <Loading/>
+            </Box>
+          )}
           {error && (
             <Box mt={4} textAlign="center">
               Erro ao carregar os carros. Por favor, tente novamente mais tarde.
