@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Container,
   Typography,
@@ -6,6 +6,7 @@ import {
   Card,
   CardContent,
   CardMedia,
+  Button,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
@@ -15,6 +16,7 @@ import { Car } from '../../types/Car' // Importe o tipo Car
 import Loading from '../../components/Loading';
 import { useParams } from 'react-router-dom';
 import VeiculoService from '../../services/VeiculoService';
+import Swal from 'sweetalert2';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -31,8 +33,12 @@ const useStyles = makeStyles((theme) => ({
   cardMedia: {
     height: 300,
   },
-  cardContent: {
-    
+  cardContent: {},
+  buttonContainer: {
+    margin: 5,
+    padding: 10,
+    display: 'flex',
+    justifyContent: 'center',
   },
 }));
 
@@ -43,27 +49,94 @@ export const DetalhesVeiculo = () => {
 
   const { id } = useParams();
   const [car, setCar] = useState<Car>();
-  const [error, setError] = useState(null); 
+  const [error, setError] = useState<any>(null); 
   const [loading, setLoading] = useState(true);
 
   const images = [
     '../src/assets/images/imageCar.jpg',
   ];
 
-
-  VeiculoService.Get(id ?? '').then((response) => {
-    console.log(response);
-      setCar(response[0]);
-    }).catch((error) => {
-        console.log(error);
-        setError(error);
-    }).finally(() => {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const {response, error, loading} = await VeiculoService.Get(id ?? '');
+        if(response) {
+          setCar(response as Car);
+        }else if(error) {
+          setError(error);
+        } else{
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro ao carregar os carros, por favor tente novamente',
+          });
+        }
+      } catch (error: any) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro ao enviar arquivo',
+          text: error.message,
+        });
+      } finally {
         setLoading(false);
+      }
+    }; 
+    fetchData();
+  }, []);
+
+  const handleEdit = () => {
+    window.location.href = `/editar-veiculo/${id}`;
+  };
+
+  const handleDelete = () => {
+    // Adicione aqui a lógica para confirmar a exclusão do carro
+    Swal.fire({
+      title: 'Deseja excluir este carro?',
+      text: 'Esta ação não pode ser desfeita.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sim, excluir',
+      cancelButtonText: 'Cancelar',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Chame a função para excluir o carro
+        deleteCar();
+      }
     });
+  };
+
+  const deleteCar = async () => {
+    try {
+      await VeiculoService.Delete(id ?? '');
+      Swal.fire({
+        icon: 'success',
+        title: 'Carro excluído com sucesso',
+        showConfirmButton: false,
+        timer: 1500,
+      }).then(() => {
+        // Redirecione para a página de listagem de carros após a exclusão
+        window.location.href = '/';
+      });
+    } catch (error: any) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro ao excluir o carro',
+        text: error.message,
+      });
+    }
+  };
 
 
   if (loading) {
-    return <Loading />; // Renderizar um componente de carregamento enquanto os dados são buscados
+   return <Container sx={{
+              minHeight: "100vh", 
+              display: "flex", 
+              flexDirection: "column", 
+              justifyContent: "center",
+              alignContent: "center", 
+              alignItems: "center"
+          }}>
+              <Loading />
+          </Container> 
   }
 
   if(error) {
@@ -129,6 +202,14 @@ export const DetalhesVeiculo = () => {
             </Card>
           </Grid>
         </Grid>
+        <div className={classes.buttonContainer}>
+          <Button variant="contained" size='large' color="primary" onClick={handleEdit}>
+            Editar
+          </Button>
+          <Button variant="contained" size='large' color="secondary" onClick={handleDelete}>
+            Deletar
+          </Button>
+        </div>
       </Container>
     </div>
   );

@@ -1,5 +1,5 @@
 export type CarroArquivo = {
-    Id: string,
+    Id?: string,
     IdCarro: string,
     IdArquivo: string
 }

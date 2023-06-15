@@ -15,10 +15,9 @@ import { Car } from '../../types/Car';
 import { Arquivo } from '../../types/Arquivo';
 import Loading from '../../components/Loading';
 import VeiculoService from '../../services/VeiculoService';
-import ArquivoService from '../../services/ArquivoService';
 import Swal from 'sweetalert2';
-import CarroArquivoService from '../../services/CarroArquivoService';
 import { CarroArquivo } from '../../types/CarroArquivo';
+import { useParams } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -40,15 +39,42 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const CadastroVeiculo = () => {
+export const EditVeiculo = () => {
   const classes = useStyles();
-
+  const { id } = useParams();
   const [selectedImage, setSelectedImage] = useState<File>();
   const [car, setCar] = useState<Car>({} as Car);
   const [arquivos, setArquivos] = useState<Arquivo[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<any>(null);
   const [carrosArquivos, setCarrosArquivos] = useState<CarroArquivo[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const {response, error, loading} = await VeiculoService.Get(id ?? '');
+        if(response) {
+          setCar(response as Car);
+        }else if(error) {
+          setError(error);
+        } else{
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro ao carregar os carros, por favor tente novamente',
+          });
+        }
+      } catch (error: any) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro ao enviar arquivo',
+          text: error.message,
+        });
+      } finally {
+        setLoading(false);
+      }
+    }; 
+    fetchData();
+  }, []);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -93,22 +119,8 @@ export const CadastroVeiculo = () => {
     
     setLoading(true);
 
-    //Insere novo carro
-    // VeiculoService.Insert(car).then((response) => {
-    //   console.log(response);
-    //     setCar(response[0]);
-    //   }).catch((error) => {
-    //     setLoading(false);
-    //     Swal.fire({
-    //       icon: 'error',
-    //       title: 'Erro ao enviar carro',
-    //       text: error.message,
-    //     });
-    // });
-
-
     try {
-      const {response, error, loading} = await VeiculoService.Insert(car);
+      const {response, error, loading} = await VeiculoService.Update(id ?? '', car);
       if(response) {
         setCar(response);
       }else if(error) {
@@ -122,86 +134,16 @@ export const CadastroVeiculo = () => {
     } catch (error: any) {
       Swal.fire({
         icon: 'error',
-        title: 'Erro ao enviar arquivo',
+        title: 'Erro ao editar carro',
         text: error.message,
       });
     } 
-      
-
-    
-    //Insere arquivos
-    // ArquivoService.UploadFiles(arquivos)
-    //   .then((response) => {
-    //     setArquivos(response);
-    //   })
-    //   .catch((error) => {
-    //     setLoading(false);
-    //     Swal.fire({
-    //       icon: 'error',
-    //       title: 'Erro ao enviar arquivo',
-    //       text: error.message,
-    //     })
-    //   });
-    try{
-      const {response, error, loading} = await ArquivoService.UploadFiles(arquivos);
-      if(response) {
-        setArquivos(response);
-      }else if(error) {
-        setError(error);
-      } else{
-        Swal.fire({
-          icon: 'error',
-          title: 'Erro ao carregar os carros. Por favor, tente novamente mais tarde.',
-        });
-      }
-    } catch (error: any) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Erro ao enviar arquivo',
-        text: error.message,
-      });
-    } 
-    
-    PopulaCarrosArquivos();
-
-    //Insere relacionamento
-    // CarroArquivoService.InsertFiles(carrosArquivos)
-    // .then((response) => {
-    //   console.log(response);
-    //   }).catch((error) => {
-    //     setLoading(false);
-    //     Swal.fire({
-    //       icon: 'error',
-    //       title: 'Erro ao enviar arquivo 2',
-    //       text: error.message,
-    //     });
-    // });
-
-    try{
-      const {response, error, loading} = await CarroArquivoService.InsertFiles(carrosArquivos);
-      if(response) {
-        console.log(response);
-      }else if(error) {
-        setError(error);
-      } else{
-        Swal.fire({
-          icon: 'error',
-          title: 'Erro ao cadastrar os arquivos. Por favor, tente novamente mais tarde.',
-        });
-      }
-    } catch (error: any) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Erro ao enviar arquivo',
-        text: error.message,
-      });
-    }
 
     setLoading(false);
 
     Swal.fire({
       icon: 'success',
-      title: 'Carro salvo com sucesso',
+      title: 'Carro atualizado com sucesso',
       confirmButtonText: 'Ok',
     }).then((result) => {
       if (result.isConfirmed) {
@@ -225,7 +167,7 @@ export const CadastroVeiculo = () => {
           <Stack direction={'row'} spacing={2} justifyContent={'center'} alignItems={'center'}>
           <Image src="../src/assets/ico/VendaVeiculosV1.ico" width={100} height={100} rounded={true} />
           <Typography variant="h4" align="center" gutterBottom>
-            Cadastrar Novo Veículo
+            Editar Veículo
           </Typography>
           </Stack>
           <form className={classes.form} onSubmit={handleSubmit}>
@@ -329,7 +271,7 @@ export const CadastroVeiculo = () => {
                   color="primary"
                   fullWidth
                 >
-                  Cadastrar
+                  Atualizar
                 </Button>
               </Grid>
             </Grid>

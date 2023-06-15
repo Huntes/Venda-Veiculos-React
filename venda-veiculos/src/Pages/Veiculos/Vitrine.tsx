@@ -6,22 +6,39 @@ import { Container, Stack, Box, Divider } from "@mui/material";
 import ResponsiveAppBar from "../../components/AppBar";
 import ActionAreaCard from "../../components/Card";
 import VeiculoService from "../../services/VeiculoService";
+import Swal from "sweetalert2";
 
 export const Vitrine = () => {
-  const [data, setData] = useState<Car[]>([]);
+  const [data, setData] = useState<Car[] | any>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | any>(null);
 
-  VeiculoService.GetAll().then((response) => {
-    console.log(response);
-    setData(response[0]);
-    }).catch((error) => {
-        console.log(error);
-        setError(error);
-    }).finally(() => {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const {response, error, loading} = await VeiculoService.GetAll();
+        if(response) {
+          setData(response as Car[]);
+        }else if(error) {
+          setError(error);
+        } else{
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro ao carregar os carros, por favor tente novamente',
+          });
+        }
+      } catch (error: any) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro ao enviar arquivo',
+          text: error.message,
+        });
+      } finally {
         setLoading(false);
-    });
-
+      }
+    }; 
+    fetchData();
+  }, []);
 
     const clickCard = (car: Car) => {
         window.location.href = `/detalhes-veiculo/${car.id}`;

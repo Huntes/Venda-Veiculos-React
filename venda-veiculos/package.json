@@ -23,7 +23,8 @@
     "react-query": "^3.39.3",
     "react-query-devtools": "^2.6.3",
     "react-responsive-carousel": "^3.2.23",
-    "react-router-dom": "^6.12.1"
+    "react-router-dom": "^6.12.1",
+    "sweetalert2": "^11.7.12"
   },
   "devDependencies": {
     "@types/node": "^20.3.0",
