@@ -93,20 +93,6 @@ export const CadastroVeiculo = () => {
     
     setLoading(true);
 
-    //Insere novo carro
-    // VeiculoService.Insert(car).then((response) => {
-    //   console.log(response);
-    //     setCar(response[0]);
-    //   }).catch((error) => {
-    //     setLoading(false);
-    //     Swal.fire({
-    //       icon: 'error',
-    //       title: 'Erro ao enviar carro',
-    //       text: error.message,
-    //     });
-    // });
-
-
     try {
       const {response, error, loading} = await VeiculoService.Insert(car);
       if(response) {
@@ -126,22 +112,9 @@ export const CadastroVeiculo = () => {
         text: error.message,
       });
     } 
-      
-
+  
     
-    //Insere arquivos
-    // ArquivoService.UploadFiles(arquivos)
-    //   .then((response) => {
-    //     setArquivos(response);
-    //   })
-    //   .catch((error) => {
-    //     setLoading(false);
-    //     Swal.fire({
-    //       icon: 'error',
-    //       title: 'Erro ao enviar arquivo',
-    //       text: error.message,
-    //     })
-    //   });
+    
     try{
       const {response, error, loading} = await ArquivoService.UploadFiles(arquivos);
       if(response) {
@@ -164,18 +137,7 @@ export const CadastroVeiculo = () => {
     
     PopulaCarrosArquivos();
 
-    //Insere relacionamento
-    // CarroArquivoService.InsertFiles(carrosArquivos)
-    // .then((response) => {
-    //   console.log(response);
-    //   }).catch((error) => {
-    //     setLoading(false);
-    //     Swal.fire({
-    //       icon: 'error',
-    //       title: 'Erro ao enviar arquivo 2',
-    //       text: error.message,
-    //     });
-    // });
+
 
     try{
       const {response, error, loading} = await CarroArquivoService.InsertFiles(carrosArquivos);
