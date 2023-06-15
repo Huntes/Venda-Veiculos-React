@@ -1,10 +1,23 @@
-import axios from 'axios';
-import { useEffect, useState } from 'react';
-import { AxiosRequestConfig } from 'axios';
+import { useState } from 'react';
 import { Car } from '../types/Car';
 import { useRequest } from './BaseService';
+import axios from 'axios';
 
 const token = localStorage.getItem('token');
+
+const sendRequest = async<T = any>(method: string, url: string, data?: T, config?: any) => {
+    try {
+      const res = await axios.request({
+        method,
+        url,
+        data,
+        ...config
+      });
+      return { response: res.data, error: null, loading: false };
+    } catch (error) {
+        return { response: null, error, loading: false };
+    } 
+};
 
 const headerSendRequest = {
     headers: {
@@ -22,33 +35,33 @@ const headerGetRequest = {
 };
 
 const GetAll = async () => {
-    const { response, error, loading } = useRequest<Car[]>({method: 'GET', url: 'https://localhost:5501/api/Vehicles/getAll', data: undefined, config: headerGetRequest})
-    return [response, error, loading]
+   
+    return sendRequest<Car[]>('GET', 'https://localhost:5501/api/Vehicles/getAll', undefined, headerGetRequest);
 }
 
 const Get = async (id: string) => {
-    const { response, error, loading } = useRequest({method: 'GET', url: `https://localhost:5501/api/Vehicles/get/${id}`, data: undefined, config: headerGetRequest})
-    return [response, error, loading]
+    
+    return await sendRequest<Car>('GET', `https://localhost:5501/api/Vehicles/get/${id}`, undefined, headerGetRequest);
 }
 
 const Insert = async (car: Car) => {
-    const { response, error, loading } = useRequest({method: 'POST', url: 'https://localhost:5501/api/Vehicles/insert-car', data: car, config: headerSendRequest})
-    return [response, error, loading]
+   
+    return await sendRequest<Car>('POST', 'https://localhost:5501/api/Vehicles/insert-car', car, headerSendRequest);
 }
 
 const Update = async (id: string, car: Car) => {
-    const { response, error, loading } = useRequest({method: 'PUT', url: `https://localhost:5501/api/Vehicles/update/${id}`, data: car, config: headerSendRequest})
-    return [response, error, loading]
+   
+    return await sendRequest<Car>('PUT', `https://localhost:5501/api/Vehicles/update/${id}`, car, headerSendRequest);
 }
 
 const ToggleCar = async (id: string) => {
-    const { response, error, loading } = useRequest({method: 'PUT', url: `https://localhost:5501/api/Vehicles/change-status/${id}`, data: undefined, config: headerSendRequest})
-    return [response, error, loading]
+    
+    return await sendRequest('PUT', `https://localhost:5501/api/Vehicles/change-status/${id}`, undefined, headerSendRequest);
 }
 
 const Delete = async (id: string) => {
-    const { response, error, loading } = useRequest({method: 'DELETE', url: `https://localhost:5501/api/Vehicles/delete/${id}`, data: undefined, config: headerSendRequest})
-    return [response, error, loading]
+    
+    return await sendRequest('DELETE', `https://localhost:5501/api/Vehicles/delete/${id}`, null, headerSendRequest);
 }
 
 //Cria um objeto que contém as funções de acesso ao backend

@@ -1,7 +1,7 @@
-import axios from 'axios';
-import { Usuario } from '../types/Usuario';
 import { useRequest } from './BaseService';
+import { Arquivo } from '../types/Arquivo';
 import { useState } from 'react';
+import axios from 'axios';
 
 const token = localStorage.getItem('token');
 
@@ -19,6 +19,7 @@ const sendRequest = async<T = any>(method: string, url: string, data?: T, config
     } 
 };
 
+
 const headerSendRequest = {
     headers: {
         'Content-Type': 'application/json',
@@ -34,25 +35,27 @@ const headerGetRequest = {
     }
 };
 
-const GetById = async (id: string) => {
-    
-    return await sendRequest('GET', `https://localhost:5501/api/User/get/${id}`, null, headerGetRequest);
-    
+const UploadFile = async (file: Arquivo) => {
+    return await sendRequest('POST', 'https://localhost:5501/api/File/upload', file, headerSendRequest);
 }
 
-const Create = async (user: Usuario) => {
-    return await sendRequest('POST', 'https://localhost:5501/api/User/insert', user, headerSendRequest);
+const UploadFiles = async (files: Arquivo[]) => {
+    return await sendRequest('POST', 'https://localhost:5501/api/File/upload-files', files, headerSendRequest);
 }
 
-const Update = async (id: string, user: Usuario) => {
-
-    return await sendRequest('PUT', `https://localhost:5501/api/User/update/${id}`, user, headerSendRequest);
+const Get = async (id: string) => {
+    return await sendRequest('GET', `https://localhost:5501/api/File/get/${id}`, null, headerGetRequest);
 }
 
-const UsuarioService = {
-    GetById,
-    Create,
-    Update
+const Delete = async (id: string) => {
+    return await sendRequest('DELETE', `https://localhost:5501/api/Arquivo/delete/${id}`, null, headerSendRequest);
 }
 
-export default UsuarioService;
+const ArquivoService = {
+    UploadFile,
+    UploadFiles,
+    Get,
+    Delete
+}
+
+export default ArquivoService;
