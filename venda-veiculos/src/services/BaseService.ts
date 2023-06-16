@@ -9,29 +9,21 @@ type RequestParams = {
     config?: AxiosRequestConfig;
 }
 
-export function useRequest<T = any>({ method, url, data, config }: RequestParams){
-    const [response, setResponse] = useState<T | null>(null);
-    const [error, setError] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
+// export function useRequest<T = any>({ method, url, data, config }: RequestParams){
 
-    useEffect(() => {
-        const request = async () => {
-            try {
-                const res = await axios.request({
-                    method,
-                    url,
-                    data,
-                    ...config
-                });
-                setResponse(res.data);
-            } catch (error) {
-                setError(error);
-            } finally {
-                setLoading(false);
-            }
-        }
-        request();
-    }, [url, method, data, config]);
+    
+//         const request = async () => {
+//             try {
+//                 const res = await axios.request({
+//                     method,
+//                     url,
+//                     data,
+//                     ...config
+//                 });
+//             } catch (error) {
+//             } finally {
+//             }
+//         }
 
-    return { response, error, loading };
-}
+//     return { response, error, loading };
+// }

@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { Login } from '../types/Login';
-import { useRequest } from './BaseService';
 import { useState } from 'react';
 
 const sendRequest = async<T = any>(method: string, url: string, data?: T, config?: any) => {
@@ -26,7 +25,7 @@ const headerRequest = {
 };
 
 const Login = async (login: Login) => {
-    return await sendRequest('POST', 'https://localhost:5501/api/Login/login', login, headerRequest);
+    return await sendRequest('POST', `${import.meta.env.VITE_API_URL}/api/Login/login`, login, headerRequest);
 }
 
 const LoginService = {

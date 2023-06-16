@@ -47,6 +47,8 @@ const useStyles = makeStyles((theme) => ({
 export const DetalhesVeiculo = () => {
   const classes = useStyles();
 
+  const token = localStorage.getItem('token');
+
   const { id } = useParams();
   const [car, setCar] = useState<Car>();
   const [error, setError] = useState<any>(null); 
@@ -67,13 +69,13 @@ export const DetalhesVeiculo = () => {
         } else{
           Swal.fire({
             icon: 'error',
-            title: 'Erro ao carregar os carros, por favor tente novamente',
+            title: 'Erro ao carregar carro selecionado, por favor tente novamente',
           });
         }
       } catch (error: any) {
         Swal.fire({
           icon: 'error',
-          title: 'Erro ao enviar arquivo',
+          title: 'Erro ao carregar carro',
           text: error.message,
         });
       } finally {
@@ -88,7 +90,6 @@ export const DetalhesVeiculo = () => {
   };
 
   const handleDelete = () => {
-    // Adicione aqui a lógica para confirmar a exclusão do carro
     Swal.fire({
       title: 'Deseja excluir este carro?',
       text: 'Esta ação não pode ser desfeita.',
@@ -98,7 +99,6 @@ export const DetalhesVeiculo = () => {
       cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
-        // Chame a função para excluir o carro
         deleteCar();
       }
     });
@@ -113,7 +113,6 @@ export const DetalhesVeiculo = () => {
         showConfirmButton: false,
         timer: 1500,
       }).then(() => {
-        // Redirecione para a página de listagem de carros após a exclusão
         window.location.href = '/';
       });
     } catch (error: any) {
@@ -148,6 +147,7 @@ export const DetalhesVeiculo = () => {
     )
   }
 
+  console.log(car)
   return (
     <div className={classes.container}>
       <Container  sx={{ minHeight: "100vh", minWidth: "100vw", padding: "0", backgroundColor: "#fff" }}>
@@ -158,11 +158,11 @@ export const DetalhesVeiculo = () => {
         <Grid container justifyContent="center" spacing={2}>
           <Grid item>
             <Carousel showThumbs={false} showStatus={false}>
-              { car?.Fotos != null 
+              { car?.fotos != null 
               ?
-                car?.Fotos?.map((image, index) => (
+                car?.fotos?.map((image, index) => (
                   <div key={index}>
-                    <img src={image.base64 || 'src/assets/images/imageCar.jpg'} alt={`Imagem ${index + 1}`} />
+                    <img src={image?.path || '../src/assets/images/imageCar.jpg'} alt={`Imagem ${index + 1}`} style={{ maxHeight: '400px', maxWidth: '600px', objectFit: 'fill' }}/>
                   </div>
                 )) 
               : 
@@ -202,6 +202,8 @@ export const DetalhesVeiculo = () => {
             </Card>
           </Grid>
         </Grid>
+        { token != null 
+        ?
         <div className={classes.buttonContainer}>
           <Button variant="contained" size='large' color="primary" onClick={handleEdit}>
             Editar
@@ -210,6 +212,9 @@ export const DetalhesVeiculo = () => {
             Deletar
           </Button>
         </div>
+        :
+        <></>
+        }
       </Container>
     </div>
   );

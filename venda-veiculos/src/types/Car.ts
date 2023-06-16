@@ -9,5 +9,5 @@ export type Car = {
     status: number,
     preco: number,
     quilometragem: string,
-    Fotos?: Arquivo[] | null
+    fotos?: Arquivo[] | null
 }

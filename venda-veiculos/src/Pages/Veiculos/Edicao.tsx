@@ -18,6 +18,10 @@ import VeiculoService from '../../services/VeiculoService';
 import Swal from 'sweetalert2';
 import { CarroArquivo } from '../../types/CarroArquivo';
 import { useParams } from 'react-router-dom';
+import { Carousel } from 'react-responsive-carousel';
+import ArquivoService from '../../services/ArquivoService';
+
+const token = localStorage.getItem('token');
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -49,6 +53,10 @@ export const EditVeiculo = () => {
   const [error, setError] = useState<any>(null);
   const [carrosArquivos, setCarrosArquivos] = useState<CarroArquivo[]>([]);
 
+  if(!token) {
+    window.location.href = '/Login';
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -76,6 +84,14 @@ export const EditVeiculo = () => {
     fetchData();
   }, []);
 
+  const handleRemoveImage = (index: number) => {
+    setCar((prevCar) => ({
+      ...prevCar,
+      fotos: prevCar.fotos?.filter((_, i) => i !== index) || []
+    }));
+  };
+  
+
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setCar((prevCar) => ({ ...prevCar, [name]: value }));
@@ -83,19 +99,22 @@ export const EditVeiculo = () => {
 
   const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event?.target?.files ?? null;
-    if(!file) return;
-
-    for(let i = 0; i < file.length; i++) {
-      let arq = {
-        nome: file[i].name,
-        tipo: file[i].type,
-        base64: await ImageConverter.convertImageToBase64(file[i] as File),
+    if (!file) return;
+  
+    for (let i = 0; i < file.length; i++) {
+      const convertedImage = await ImageConverter.convertImageToBase64(file[i] as File);
+      const newFoto = {
+        nome: file[i].name ?? `Foto ${i + 1}`,
+        tipo: file[i].type ?? 'image/jpeg',
+        path: convertedImage,
       } as Arquivo;
-
-      setArquivos((prevArquivos) => [...prevArquivos, arq]);
-      console.log(arquivos)
+      setCar((prevCar) => ({
+        ...prevCar,
+        fotos: [...(prevCar.fotos || []), newFoto],
+      }));
     }
   };
+  
 
   const PopulaCarrosArquivos = () => {
     let carrosArquivosAux: CarroArquivo[] = [];
@@ -114,15 +133,19 @@ export const EditVeiculo = () => {
     console.log(car);
   }
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = async () => {
     
     setLoading(true);
+
+    car.fotos?.forEach((foto) => {
+      foto.nome = foto.nome ?? 'Foto';
+      foto.tipo = foto.tipo ?? 'image/jpeg';
+    });
 
     try {
       const {response, error, loading} = await VeiculoService.Update(id ?? '', car);
       if(response) {
-        setCar(response);
+        console.log(response)
       }else if(error) {
         setError(error);
       } else{
@@ -135,6 +158,31 @@ export const EditVeiculo = () => {
       Swal.fire({
         icon: 'error',
         title: 'Erro ao editar carro',
+        text: error.message,
+      });
+    } 
+
+    let arquivoCarro = {
+      idCarro: id ?? '',
+      arquivos: car.fotos ?? [],
+    }
+
+    try{
+      const {response, error, loading} = await ArquivoService.UploadFilesCar(arquivoCarro);
+      if(response) {
+          
+      }else if(error) {
+        setError(error);
+      } else{
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro ao atualizar arquivos de foto do carro. Por favor, tente novamente mais tarde.',
+        });
+      }
+    } catch (error: any) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro ao enviar arquivos de foto do carro',
         text: error.message,
       });
     } 
@@ -170,7 +218,7 @@ export const EditVeiculo = () => {
             Editar Veículo
           </Typography>
           </Stack>
-          <form className={classes.form} onSubmit={handleSubmit}>
+          <form className={classes.form}>
             <Grid container spacing={2}>
               <Grid item xs={6}>
                 <TextField
@@ -245,6 +293,40 @@ export const EditVeiculo = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
+              <Grid item xs={12} maxHeight={250} maxWidth={250}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {car.fotos && car.fotos.length > 0 ? (
+                    <Carousel showThumbs={false} width={'550px'}>
+                      {car.fotos.map((foto, index) => (
+                        <div key={index} style={{ height: '250px', position: 'relative', maxWidth: '550px' }}>
+                          <img
+                            src={foto.path ?? '../src/assets/images/imageCar.jpg'}
+                            alt={`Foto ${index + 1}`}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          />
+                          <Button
+                            variant="contained"
+                            onClick={() => handleRemoveImage(index)}
+                            style={{
+                              position: 'absolute',
+                              bottom: '10px',
+                              right: '10px',
+                              zIndex: 1,
+                            }}
+                          >
+                            Remover
+                          </Button>
+                        </div>
+                      ))}
+                    </Carousel>
+                  ) : (
+                    <Typography variant="body2">
+                      <img style={{height: '250px', width: '550px', objectFit: 'cover'}} title='Sem fotos adicionadas' src='../src/assets/images/imageCar.jpg' />
+                    </Typography>
+                  )}
+                </div>
+              </Grid>
+
               <Grid item xs={12}>
                 <input
                   accept="image/*"
@@ -266,10 +348,10 @@ export const EditVeiculo = () => {
               </Grid>
               <Grid item xs={12}>
                 <Button
-                  type="submit"
                   variant="contained"
                   color="primary"
                   fullWidth
+                  onClick={(e) => handleSubmit()}
                 >
                   Atualizar
                 </Button>

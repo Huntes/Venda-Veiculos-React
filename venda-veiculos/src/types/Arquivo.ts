@@ -4,5 +4,5 @@ export type Arquivo = Base & {
     id?: string,
     nome: string,
     tipo: string,
-    base64: string,
+    path: string,
 }

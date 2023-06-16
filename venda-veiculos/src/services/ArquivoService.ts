@@ -1,7 +1,7 @@
-import { useRequest } from './BaseService';
 import { Arquivo } from '../types/Arquivo';
 import { useState } from 'react';
 import axios from 'axios';
+import { ArquivoCar } from '../types/ArquivoCar';
 
 const token = localStorage.getItem('token');
 
@@ -36,24 +36,29 @@ const headerGetRequest = {
 };
 
 const UploadFile = async (file: Arquivo) => {
-    return await sendRequest('POST', 'https://localhost:5501/api/File/upload', file, headerSendRequest);
+    return await sendRequest('POST', `${import.meta.env.VITE_API_URL}/api/File/upload`, file, headerSendRequest);
 }
 
 const UploadFiles = async (files: Arquivo[]) => {
-    return await sendRequest('POST', 'https://localhost:5501/api/File/upload-files', files, headerSendRequest);
+    return await sendRequest('POST', `${import.meta.env.VITE_API_URL}/api/File/upload-files/`, files, headerSendRequest);
+}
+
+const UploadFilesCar = async (files: ArquivoCar) => {
+    return await sendRequest('POST', `${import.meta.env.VITE_API_URL}/api/File/upload-files-car/`, files, headerSendRequest);
 }
 
 const Get = async (id: string) => {
-    return await sendRequest('GET', `https://localhost:5501/api/File/get/${id}`, null, headerGetRequest);
+    return await sendRequest('GET', `${import.meta.env.VITE_API_URL}/api/File/get/${id}`, null, headerGetRequest);
 }
 
 const Delete = async (id: string) => {
-    return await sendRequest('DELETE', `https://localhost:5501/api/Arquivo/delete/${id}`, null, headerSendRequest);
+    return await sendRequest('DELETE', `${import.meta.env.VITE_API_URL}/api/Arquivo/delete/${id}`, null, headerSendRequest);
 }
 
 const ArquivoService = {
     UploadFile,
     UploadFiles,
+    UploadFilesCar,
     Get,
     Delete
 }

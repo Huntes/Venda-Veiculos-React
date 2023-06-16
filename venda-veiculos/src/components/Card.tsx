@@ -19,12 +19,14 @@ const ActionAreaCard = ({data, onClick }: CardProps) =>{
       onClick(data) 
     }
 
+    console.log(data)
+
     //Efeitos Hover
     const handleMouseEnter = () => setIsHovered(true)
     const handleMouseLeave = () => setIsHovered(false)
 
   return (
-    <Card sx={{ width: 250, maxWidth: 345, margin: 2, padding: 0, textDecoration: isHovered ? 'underline' : 'none', title: isHovered ? 'Clique para ver mais detalhes' : ''}} 
+    <Card sx={{ maxHeight: 255, width: 250, maxWidth: 345, margin: 2, padding: 0, textDecoration: isHovered ? 'underline' : 'none', title: isHovered ? 'Clique para ver mais detalhes' : ''}} 
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}>
@@ -32,11 +34,11 @@ const ActionAreaCard = ({data, onClick }: CardProps) =>{
         <CardMedia
           component="img"
           height="140"
-          image={data?.Fotos?.[0]?.base64 ?? 'src/assets/images/imageCar.jpg'}
+          image={data?.fotos?.[0]?.path ?? 'src/assets/images/imageCar.jpg'}
           alt={''}
         />
         <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
+          <Typography sx={{ maxHeight: '35px', overflow: 'auto' }} gutterBottom variant="h5" component="div">
             {`${data?.nome} - ${data?.modelo}`}
           </Typography>
           <Typography variant="body2" color="text.secondary">

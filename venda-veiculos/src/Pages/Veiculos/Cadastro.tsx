@@ -19,6 +19,9 @@ import ArquivoService from '../../services/ArquivoService';
 import Swal from 'sweetalert2';
 import CarroArquivoService from '../../services/CarroArquivoService';
 import { CarroArquivo } from '../../types/CarroArquivo';
+import { ArquivoCar } from '../../types/ArquivoCar';
+
+const token = localStorage.getItem('token');
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -43,6 +46,10 @@ const useStyles = makeStyles((theme) => ({
 export const CadastroVeiculo = () => {
   const classes = useStyles();
 
+  if(!token) {
+    window.location.href = '/Login';
+  }
+
   const [selectedImage, setSelectedImage] = useState<File>();
   const [car, setCar] = useState<Car>({} as Car);
   const [arquivos, setArquivos] = useState<Arquivo[]>([]);
@@ -59,11 +66,12 @@ export const CadastroVeiculo = () => {
     const file = event?.target?.files ?? null;
     if(!file) return;
 
+    //TESTAR ISSO DAQUI
     for(let i = 0; i < file.length; i++) {
       let arq = {
         nome: file[i].name,
         tipo: file[i].type,
-        base64: await ImageConverter.convertImageToBase64(file[i] as File),
+        path: await ImageConverter.convertImageToBase64(file[i] as File),
       } as Arquivo;
 
       setArquivos((prevArquivos) => [...prevArquivos, arq]);
@@ -82,23 +90,26 @@ export const CadastroVeiculo = () => {
 
       carrosArquivosAux.push(carArq);
     }
-    console.log('chegou aqui');
+
     setCarrosArquivos(carrosArquivosAux);
-    console.log(arquivos);
-    console.log(car);
   }
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = async () => {
     
     setLoading(true);
+
+    let carID = null;
 
     try {
       const {response, error, loading} = await VeiculoService.Insert(car);
       if(response) {
-        setCar(response);
+        carID = response.id;
       }else if(error) {
-        setError(error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro ao carregar os carros. Por favor, tente novamente mais tarde.',
+          error: error.response.data as string,
+        });
       } else{
         Swal.fire({
           icon: 'error',
@@ -113,12 +124,15 @@ export const CadastroVeiculo = () => {
       });
     } 
   
-    
-    
+    let arquivoCarro = {
+      idCarro: carID,
+      arquivos: arquivos,
+    }
+
     try{
-      const {response, error, loading} = await ArquivoService.UploadFiles(arquivos);
+      const {response, error, loading} = await ArquivoService.UploadFilesCar(arquivoCarro);
       if(response) {
-        setArquivos(response);
+          
       }else if(error) {
         setError(error);
       } else{
@@ -135,9 +149,8 @@ export const CadastroVeiculo = () => {
       });
     } 
     
+    
     PopulaCarrosArquivos();
-
-
 
     try{
       const {response, error, loading} = await CarroArquivoService.InsertFiles(carrosArquivos);
@@ -190,7 +203,7 @@ export const CadastroVeiculo = () => {
             Cadastrar Novo Veículo
           </Typography>
           </Stack>
-          <form className={classes.form} onSubmit={handleSubmit}>
+          <form className={classes.form}>
             <Grid container spacing={2}>
               <Grid item xs={6}>
                 <TextField
@@ -286,10 +299,10 @@ export const CadastroVeiculo = () => {
               </Grid>
               <Grid item xs={12}>
                 <Button
-                  type="submit"
                   variant="contained"
                   color="primary"
                   fullWidth
+                  onClick={handleSubmit}
                 >
                   Cadastrar
                 </Button>

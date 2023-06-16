@@ -1,7 +1,5 @@
-import { useRequest } from './BaseService';
 import { CarroArquivo } from '../types/CarroArquivo';
 import axios from 'axios';
-import { useState } from 'react';
 
 const token = localStorage.getItem('token');
 
@@ -29,11 +27,11 @@ const headerSendRequest = {
 };
 
 const Insert = async (carroArquivo: CarroArquivo) => {
-    return await sendRequest('POST', 'https://localhost:5501/api/FileVehicles/insert', carroArquivo, headerSendRequest);
+    return await sendRequest('POST', `${import.meta.env.VITE_API_URL}/api/FileVehicles/insert`, carroArquivo, headerSendRequest);
 }
 
 const InsertFiles = async (carroArquivos: CarroArquivo[]) => {
-    return await sendRequest('POST', 'https://localhost:5501/api/FileVehicles/insert-files', carroArquivos, headerSendRequest);
+    return await sendRequest('POST', `${import.meta.env.VITE_API_URL}/api/FileVehicles/insert-files`, carroArquivos, headerSendRequest);
 }
 
 const CarroArquivoService = {

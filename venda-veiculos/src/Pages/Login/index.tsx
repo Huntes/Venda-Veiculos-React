@@ -15,7 +15,7 @@ import Swal from 'sweetalert2';
 
 const useStyles = makeStyles((theme) => ({
   container: {
-    backgroundColor: '#e1f5fe',
+    backgroundColor: '#fff',
     minHeight: '100vh',
     display: 'flex',
     justifyContent: 'center',
@@ -32,6 +32,15 @@ export const LoginPage = () => {
   const [error, setError] = useState<any>(null);
 
   const handleLogin = async () => {
+
+    if (!login.login || !login.password) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Preencha todos os campos.',
+      });
+      return;
+    }
+
     try{
       const {response, error, loading} = await LoginService.Login(login);
       if(response) {
@@ -42,7 +51,7 @@ export const LoginPage = () => {
         Swal.fire({
           icon: 'error',
           title: 'Erro ao tentar realizar login.',
-          text: error,
+          text: error?.response?.data as string,
         });
       } else{
         Swal.fire({
@@ -69,7 +78,7 @@ export const LoginPage = () => {
         <Typography variant="h4" align="center" gutterBottom>
           Login
         </Typography>
-        <form className={classes.form} onSubmit={handleLogin}>
+        <form className={classes.form}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
@@ -93,7 +102,6 @@ export const LoginPage = () => {
             </Grid>
             <Grid item xs={12}>
               <Button
-                type="submit"
                 variant="contained"
                 color="primary"
                 fullWidth
@@ -104,7 +112,6 @@ export const LoginPage = () => {
             </Grid>
             <Grid item xs={12}>
               <Button
-                type="submit"
                 variant="contained"
                 color="secondary"
                 fullWidth

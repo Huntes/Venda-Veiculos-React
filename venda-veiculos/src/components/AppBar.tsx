@@ -11,17 +11,22 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import AdbIcon from '@mui/icons-material/Adb';
 import CarRentalIcon from '@mui/icons-material/CarRental';
 import { Image } from 'react-bootstrap';
 import { Stack } from '@mui/material';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import LoginIcon from '@mui/icons-material/Login';
 
-const pages = ['Home', 'Cadastrar Veículo', 'Cadastrar Usuario'];
-const settings = ['Login', 'Dashboard', 'Logout'];
+const token = localStorage.getItem('token');
+const pages = ['Home'];
+const settings = ['Login', 'Logout'];
+
+token && pages.push('Cadastrar Veículo');
 
 function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -41,6 +46,26 @@ function ResponsiveAppBar() {
     setAnchorElUser(null);
   };
 
+  const clickIconUserOptions = (event: React.MouseEvent<HTMLElement>) => {
+    console.log(event);
+    event.preventDefault();
+
+    let button = event.target as HTMLElement;
+
+    switch(button.innerText.toUpperCase()){
+      case 'LOGIN':
+        window.location.href = '/Login';
+        break;
+      case 'LOGOUT':
+        localStorage.removeItem('token');
+        window.location.href = '/';
+        break;
+      default:
+        break;
+    }
+    setAnchorElUser(null);
+  }
+
   const clickMenuOptions = (event: React.MouseEvent<HTMLElement>) => {
     console.log(event);
     event.preventDefault();
@@ -50,12 +75,6 @@ function ResponsiveAppBar() {
     switch(button.innerText.toUpperCase()){
       case 'CADASTRAR VEÍCULO':
         window.location.href = '/CadastroVeiculo';
-        break;
-      case 'PESQUISAR VEÍCULO':
-        window.location.href = '/Detalhes';
-        break;
-      case 'CADASTRAR USUARIO':
-        window.location.href = '/CadastroUsuario';
         break;
       case 'HOME':
         window.location.href = '/';
@@ -111,7 +130,6 @@ function ResponsiveAppBar() {
               ))}
             </Menu>
           </Box>
-          <CarRentalIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }}/>
           <Typography
             variant="h5"
             noWrap
@@ -142,10 +160,12 @@ function ResponsiveAppBar() {
             ))}
           </Box>
 
+          { token != null 
+          ? 
           <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Opções">
+            <Tooltip title="Login">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Usuário" src="/static/images/avatar/2.jpg" />
+                <AccountCircleIcon sx={{ fontSize: 40 }} />
               </IconButton>
             </Tooltip>
             <Menu
@@ -164,13 +184,40 @@ function ResponsiveAppBar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
+                <MenuItem key={settings[1]}>
+                  <Typography textAlign="center" onClick={clickIconUserOptions}>{settings[1]}</Typography>
                 </MenuItem>
-              ))}
             </Menu>
-          </Box>
+          </Box> 
+          : 
+          <Box sx={{ flexGrow: 0 }}>
+            <Tooltip title="Login">
+              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                <LoginIcon sx={{ fontSize: 35, color: 'white' }}  />
+              </IconButton>
+            </Tooltip>
+            <Menu
+              sx={{ mt: '45px' }}
+              id="menu-appbar"
+              anchorEl={anchorElUser}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              open={Boolean(anchorElUser)}
+              onClose={handleCloseUserMenu}
+            >
+                <MenuItem key={settings[0]}>
+                  <Typography textAlign="center" onClick={clickIconUserOptions}>{settings[0]}</Typography>
+                </MenuItem>
+            </Menu>
+          </Box> 
+          }
         </Toolbar>
       </Container>
     </AppBar>

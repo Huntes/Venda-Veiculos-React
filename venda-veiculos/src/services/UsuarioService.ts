@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { Usuario } from '../types/Usuario';
-import { useRequest } from './BaseService';
 import { useState } from 'react';
 
 const token = localStorage.getItem('token');
@@ -36,17 +35,17 @@ const headerGetRequest = {
 
 const GetById = async (id: string) => {
     
-    return await sendRequest('GET', `https://localhost:5501/api/User/get/${id}`, null, headerGetRequest);
+    return await sendRequest('GET', `${import.meta.env.VITE_API_URL}/api/User/get/${id}`, null, headerGetRequest);
     
 }
 
 const Create = async (user: Usuario) => {
-    return await sendRequest('POST', 'https://localhost:5501/api/User/insert', user, headerSendRequest);
+    return await sendRequest('POST', `${import.meta.env.VITE_API_URL}/api/User/insert`, user, headerSendRequest);
 }
 
 const Update = async (id: string, user: Usuario) => {
 
-    return await sendRequest('PUT', `https://localhost:5501/api/User/update/${id}`, user, headerSendRequest);
+    return await sendRequest('PUT', `${import.meta.env.VITE_API_URL}/api/User/update/${id}`, user, headerSendRequest);
 }
 
 const UsuarioService = {

@@ -13,7 +13,7 @@ import Swal from 'sweetalert2';
 
 const useStyles = makeStyles((theme) => ({
   container: {
-    backgroundColor: '#e1f5fe',
+    backgroundColor: '#fff',
     minHeight: '100vh',
     display: 'flex',
     justifyContent: 'center',
@@ -33,6 +33,10 @@ export const CadastroUsuario = () => {
     window.location.href = '/Login';
   };
 
+  const handleLoja = () => {
+    window.location.href = '/';
+  };
+
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     setUser({
       ...user,
@@ -40,8 +44,15 @@ export const CadastroUsuario = () => {
     });
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = async () => {
+
+    if (!user.nome || !user.email || !user.senha) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Preencha todos os campos.',
+      });
+      return;
+    }
 
     try {
       const response = await UsuarioService.Create(user);
@@ -71,7 +82,7 @@ export const CadastroUsuario = () => {
         <Typography variant="h4" align="center" gutterBottom>
           Cadastro de Usuário
         </Typography>
-        <form className={classes.form} onSubmit={handleSubmit}>
+        <form className={classes.form}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
@@ -117,12 +128,22 @@ export const CadastroUsuario = () => {
             </Grid>
             <Grid item xs={12}>
               <Button
-                type="submit"
                 variant="contained"
                 color="secondary"
                 fullWidth
+                onClick={handleSubmit}
               >
                 Cadastrar
+              </Button>
+            </Grid>
+            <Grid item xs={12}>
+              <Button
+                variant="contained"
+                color="success"
+                fullWidth
+                onClick={handleLoja}
+              >
+                Loja
               </Button>
             </Grid>
           </Grid>
